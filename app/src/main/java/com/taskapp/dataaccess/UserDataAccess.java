@@ -75,7 +75,7 @@ public class UserDataAccess {
                 String name = values[1];
                 String email = values[2];
                 String password = values[3];
-                user = new User(userCode, name, email, password);
+                user = new User(code, name, email, password);
                 break;
             }
         } catch (IOException e) {

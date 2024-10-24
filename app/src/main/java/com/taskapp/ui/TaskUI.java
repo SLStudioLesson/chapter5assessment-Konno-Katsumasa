@@ -27,6 +27,7 @@ public class TaskUI {
 
     /**
      * 自動採点用に必要なコンストラクタのため、皆さんはこのコンストラクタを利用・削除はしないでください
+     * 
      * @param reader
      * @param userLogic
      * @param taskLogic
@@ -45,7 +46,7 @@ public class TaskUI {
      * @see #selectSubMenu()
      * @see #inputNewInformation()
      */
-    
+
     public void displayMenu() {
         System.out.println("タスク管理アプリケーションにようこそ!!");
         inputLogin();
@@ -57,40 +58,41 @@ public class TaskUI {
                 System.out.println("1. タスク一覧, 2. タスク新規登録, 3. ログアウト");
                 System.out.print("選択肢：");
                 String selectMenu = reader.readLine();
-                
+
                 System.out.println();
-                
+
                 switch (selectMenu) {
                     case "1":
-                    //ここにshowAll()
-                    taskLogic.showAll(loginUser);
-                    break;
+                        // ここにshowAll()
+                        taskLogic.showAll(loginUser);
+                        // selectSubMenu();
+                        break;
                     case "2":
-                    // inputNewInformation();
-                    break;
+                        inputNewInformation();
+                        break;
                     case "3":
-                    System.out.println("ログアウトしました。");
-                    flg = false;
-                    break;
+                        System.out.println("ログアウトしました。");
+                        flg = false;
+                        break;
                     default:
                         System.out.println("選択肢が誤っています。1~3の中から選択してください。");
                         break;
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
                 }
-                System.out.println();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
+            System.out.println();
         }
-        
-        /**
-         * ユーザーからのログイン情報を受け取り、ログイン処理を行います。
-         *
-         * @see com.taskapp.logic.UserLogic#login(String, String)
-         */
-    //ここにログインのメソッドを作る
-    public void inputLogin() {
-         boolean flg = true;
+    }
+
+    /**
+     * ユーザーからのログイン情報を受け取り、ログイン処理を行います。
+     *
+     * @see com.taskapp.logic.UserLogic#login(String, String)
+     */
+    // ここにログインのメソッドを作る
+    public void inputLogin(){
+        boolean flg = true;
         while (flg) {
             try {
                 System.out.print("メールアドレスを入力してください：");
@@ -101,7 +103,7 @@ public class TaskUI {
                 flg = false;
             } catch (IOException e) {
                 e.printStackTrace();
-            }catch(AppException e){
+            } catch (AppException e) {
                 System.out.println(e.getMessage());
             }
         }
@@ -121,14 +123,30 @@ public class TaskUI {
                 String taskCode = reader.readLine();
                 if (!isNumeric(taskCode)) {
                     System.out.println("コードは半角の数字で入力してください");
+                    continue;
                 }
                 System.out.println("タスク名を入力してください：");
                 String taskName = reader.readLine();
                 if ((taskName.length() > 10)) {
                     System.out.println("タスク名は10文字以内で入力してください");
+                    continue;
                 }
-            } catch (Exception e) {
-                // TODO: handle exception
+                System.out.println("担当するユーザーのコードを選択してください：");
+                String repCod = reader.readLine();
+                if (!isNumeric(repCod)) {
+                    System.out.println("ユーザーのコードは半角の数字で入力してください");
+                    continue;
+                }
+                // loginUser.findByCode(Integer.parseInt(repCod));
+
+                taskLogic.save(Integer.parseInt(taskCode), taskName, Integer.parseInt(repCod), loginUser);
+                System.out.println(taskName + "の登録が完了しました。");
+
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (AppException e) {
+                System.out.println( e.getMessage());
             }
         }
     }
@@ -140,6 +158,45 @@ public class TaskUI {
      * @see #inputDeleteInformation()
      */
     // public void selectSubMenu() {
+    //     boolean flg = true;
+    //     while (flg) {
+    //         try {
+    //         System.out.println("以下1~2から好きな選択肢を選んでください。");
+    //     System.out.print("1. タスクのステータス変更, 2. メインメニューに戻る");
+    //     String select = reader.readLine();
+    //     switch (select) {
+    //         case "1":
+    //             //changeStatusint int code, int status,User loginUser
+    //             System.out.print("ステータスを変更するタスクコードを入力してください：");
+    //             String input1 = reader.readLine();
+    //             if (!isNumeric(input1)) {//これを引数に渡す
+    //                 System.out.println("コードは半角の数字で入力してください");
+    //                 continue;
+    //             }
+    //             System.out.println("どのステータスに変更するか選択してください。");
+    //             System.out.print("1. 着手中, 2. 完了");
+    //             String input2 = reader.readLine();
+    //             if (!isNumeric(input2)) {//これを引数に渡す
+    //                 System.out.println("ステータスは半角の数字で入力してください");
+    //                 continue;
+    //             }
+    //             if (!(input2.equals("1")||input2.equals("2"))) {
+    //                 System.out.println("ステータスは1・2の中から選択してください");
+    //                 continue;
+    //             }
+    //             // taskLogic.changeStatus(Integer.parseInt(input1), Integer.parseInt(input2), loginUser);
+    //             break;
+        
+    //         default:
+    //             break;
+    //     }
+    //     } catch (IOException e) {
+    //         e.printStackTrace();
+    //     // }catch(AppException e){
+    //     //     System.out.println(e.getMessage());
+    //     // }
+    //     }
+        
     // }
 
     /**
@@ -168,6 +225,6 @@ public class TaskUI {
      * @return 数値であればtrue、そうでなければfalse
      */
     public boolean isNumeric(String inputText) {
-        return false;
+        return inputText.chars().allMatch(c -> Character.isDigit((char) c));
     }
 }
