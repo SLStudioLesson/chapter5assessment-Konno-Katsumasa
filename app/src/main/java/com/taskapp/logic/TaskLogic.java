@@ -113,11 +113,32 @@ public class TaskLogic {
      * @param loginUser ログインユーザー
      * @throws AppException タスクコードが存在しない、またはステータスが前のステータスより1つ先でない場合にスローされます
      */
-    // public void changeStatus(int code, int status,
-    //                         User loginUser) throws AppException {
-    //                 String taskCodename = 
-    //         Task task = new Task(code, , status, loginUser);
-    // }
+    public void changeStatus(int code, int status,
+                            User loginUser) throws AppException {
+                    
+            Task task = taskDataAccess.findByCode(code);//ユーザーが選択したコードに対応したcsvのデータを受け取った
+            //この時点ではnullの可能性がある。
+            if ((task == null)) {
+                throw new AppException("存在するタスクコードを入力してください");
+            }
+            int taskCode = task.getStatus();
+            if (taskCode ==0&& status ==2) {//変更できるパターン 0->1,1->2
+                throw new AppException("ステータスは、前のステータスより1つ先のもののみを選択してください");
+            }else if((taskCode == 2)){
+                throw new AppException("ステータスは、前のステータスより1つ先のもののみを選択してください");
+            }else if (taskCode == 1 && status == 1) {
+                throw new AppException("ステータスは、前のステータスより1つ先のもののみを選択してください");
+            }
+            task = new Task(task.getCode(), task.getName(), status, loginUser);
+            taskDataAccess.update(task);//この内容を書き込む
+            //int taskCode, int changeUserCode, int status, LocalDate changeDate
+            //Logにもデータを渡すStatusは変更後のステータスChange_User_Codeは今ログインしてるユーザーコード
+            //taskCodeはそのままcode,chengeUsercodeはloginUser.getcode,sttusは受け取った方のstatus,
+            Log log = new Log(code, loginUser.getCode(), status, LocalDate.now());
+            //logをlogDataAccessに渡して書き込ませる
+            logDataAccess.save(log);
+
+    }
 
     /**
      * タスクを削除します。
